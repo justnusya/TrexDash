@@ -76,7 +76,7 @@
         </Button>
         <Image x:Name="ChoosingCharBackground" Height="600" Width="Auto" VerticalAlignment="Center" HorizontalAlignment="Center" 
                Source="C:\Users\Legion\source\repos\TrexDash\TrexDash\ChoosingCharBackground.png"/>
-        <Button x:Name="RightButton" Width="60" Height="60" Click="RightButtonClick" Margin="538,242,247,227" RenderTransformOrigin="0.5,0.5">
+        <Button x:Name="RightButton" Width="60" Height="60" Click="RightButtonClick" Margin="549,219,235.571,252.429" RenderTransformOrigin="0.5,0.5">
             <Button.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -101,7 +101,7 @@
                 </ControlTemplate>
             </Button.Template>
         </Button>
-        <Button x:Name="LeftButton" Width="60" Height="60" Click="LeftButtonClick" Margin="247,242,538,227" RenderTransformOrigin="0.5,0.5">
+        <Button x:Name="LeftButton" Width="60" Height="60" Click="LeftButtonClick" Margin="228,222,556.571,249.429" RenderTransformOrigin="0.5,0.5">
             <Button.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -126,6 +126,15 @@
                 </ControlTemplate>
             </Button.Template>
         </Button>
-
+        <Image x:Name="Dino" Height="120" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,60" 
+               Source="C:\Users\Legion\source\repos\TrexDash\TrexDash\Final Coloured Dino.png"/>
+        <Image x:Name="Cow" Height="100" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,60"
+               Source="C:\Users\Legion\source\repos\TrexDash\TrexDash\Cow.png"/>
+        <Image x:Name="UFO" Height="150" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,60"
+               Source="C:\Users\Legion\source\repos\TrexDash\TrexDash\UFO.png"/>
+        <Button x:Name="PlayButton" Content="Play" BorderBrush="Black" BorderThickness="3" Background="#FF377D22" FontSize="16" FontFamily="Consolas"
+                HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,200,0,0" Width="105" Height="35" FontWeight="Bold" 
+                Style="{DynamicResource StartButton}" Click="StartButtonClick">
+        </Button>
     </Grid>
 </Window>

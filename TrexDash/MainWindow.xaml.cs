@@ -20,6 +20,7 @@ namespace TrexDash
     /// </summary>
     public partial class MainWindow : Window
     {
+        int charCount = 2;
         public MainWindow()
         {
             InitializeComponent();
@@ -35,16 +36,46 @@ namespace TrexDash
             MainGrid.Children.Add(ChoosingCharBackground);
             MainGrid.Children.Add(RightButton);
             MainGrid.Children.Add(LeftButton);
+            Dino.Opacity = 1;
+            Cow.Opacity = 0;
+            UFO.Opacity = 0;
+            MainGrid.Children.Add(Cow);
+            MainGrid.Children.Add(UFO);
+            MainGrid.Children.Add(Dino);
+            MainGrid.Children.Add(PlayButton);
         }
 
         private void RightButtonClick(object sender, RoutedEventArgs e)
         {
-            MainGrid.Children.Remove(ChoosingCharBackground);
+            charCount++;
+            if (charCount > 2) { charCount = 0; }
+            SetCharacterVisibility(charCount);
         }
 
         private void LeftButtonClick(object sender, RoutedEventArgs e)
         {
-            MainGrid.Children.Remove(ChoosingCharBackground);
+            charCount--;
+            if (charCount < 0) { charCount = 2; }
+            SetCharacterVisibility(charCount);
+        }
+        private void SetCharacterVisibility(int index)
+        {
+            Cow.Opacity = 0;
+            UFO.Opacity = 0;
+            Dino.Opacity = 0;
+
+            switch (index)
+            {
+                case 0:
+                    UFO.Opacity = 1;
+                    break;
+                case 1:
+                    Cow.Opacity = 1;
+                    break;
+                case 2:
+                    Dino.Opacity = 1;
+                    break;
+            }
         }
     }
 }

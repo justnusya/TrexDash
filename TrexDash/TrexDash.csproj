@@ -100,5 +100,10 @@
   <ItemGroup>
     <Resource Include="ChoosingCharBackground.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Cow.png" />
+    <Resource Include="Final Coloured Dino.png" />
+    <Resource Include="UFO.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
