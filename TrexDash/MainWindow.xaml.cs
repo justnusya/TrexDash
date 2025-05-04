@@ -24,25 +24,19 @@ namespace TrexDash
         public MainWindow()
         {
             InitializeComponent();
-            MainGrid.Children.Clear();
-            MainGrid.Children.Add(StartThubmnail);
-            MainGrid.Children.Add(StartButton);
+            MainCanvas.Children.Clear();
+            MainCanvas.Children.Add(StartThubmnail);
+            MainCanvas.Children.Add(StartButton);
         }
 
         private void StartButtonClick(object sender, RoutedEventArgs e)
         {
-            MainGrid.Children.Remove(StartThubmnail);
-            MainGrid.Children.Remove(StartButton);
-            MainGrid.Children.Add(ChoosingCharBackground);
-            MainGrid.Children.Add(RightButton);
-            MainGrid.Children.Add(LeftButton);
-            Dino.Opacity = 1;
-            Cow.Opacity = 0;
-            UFO.Opacity = 0;
-            MainGrid.Children.Add(Cow);
-            MainGrid.Children.Add(UFO);
-            MainGrid.Children.Add(Dino);
-            MainGrid.Children.Add(PlayButton);
+            MainCanvas.Children.Remove(StartThubmnail);
+            MainCanvas.Children.Remove(StartButton);
+            var elementsToAdd = new UIElement[] { ChoosingCharBackground, RightButton, LeftButton, Cow, UFO, Dino, PlayButton };
+            foreach (var el in elementsToAdd)
+                MainCanvas.Children.Add(el);
+            SetCharacterVisibility(2);
         }
 
         private void RightButtonClick(object sender, RoutedEventArgs e)
@@ -76,6 +70,11 @@ namespace TrexDash
                     Dino.Opacity = 1;
                     break;
             }
+        }
+        private void PlayButtonClick(object sender, RoutedEventArgs e)
+        {
+            MainCanvas.Children.Clear();
+            Dino dino = new Dino(MainCanvas);
         }
     }
 }
