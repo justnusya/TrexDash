@@ -21,6 +21,7 @@ namespace TrexDash
     public partial class MainWindow : Window
     {
         int charCount = 2;
+        private Func<Canvas, Character> characterFactory;
         public MainWindow()
         {
             InitializeComponent();
@@ -62,19 +63,22 @@ namespace TrexDash
             {
                 case 0:
                     UFO.Opacity = 1;
+                    characterFactory = canvas => new UFO(canvas);
                     break;
                 case 1:
                     Cow.Opacity = 1;
+                    characterFactory = canvas => new Cow(canvas);
                     break;
                 case 2:
                     Dino.Opacity = 1;
+                    characterFactory = canvas => new Dino(canvas);
                     break;
             }
         }
         private void PlayButtonClick(object sender, RoutedEventArgs e)
         {
             MainCanvas.Children.Clear();
-            Dino dino = new Dino(MainCanvas);
+            Character player = characterFactory(MainCanvas);
         }
     }
 }

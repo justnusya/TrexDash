@@ -17,42 +17,22 @@ namespace TrexDash
         protected int height = 70;
         protected int health=3;
         protected double currentYPosition = 0;
-        public abstract void Jump();
-        protected void DecreaseHealth()
-        {
-            health -= 1;
-        }
-        protected void IncreaseHealth()
-        {
-            if (health < 3)
-            {
-                health++;
-            }
-        }
-        protected void SetHealth(int value)
-        {
-            health = value;
-        }
-    }
-    public class Dino : Character
-    {
-        private Image image { get; set; }
-        public Dino(Canvas MainCanvas)
+        protected int jumpHeight = 20;
+        protected int jumpSpeed = 2;
+        protected Image image;
+        protected Character(Canvas mainCanvas, string imagePath)
         {
             image = new Image
             {
-                Source = new BitmapImage(new Uri("C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\Final Coloured Dino.png")),
+                Source = new BitmapImage(new Uri(imagePath)),
                 Height = height
             };
             Canvas.SetLeft(image, x);
             Canvas.SetTop(image, y);
-            MainCanvas.Children.Add(image);
+            mainCanvas.Children.Add(image);
         }
-        public override void Jump()
+        public virtual void Jump()
         {
-            double jumpHeight = 20;
-            double jumpSpeed = 2;
-
             for (int i = 0; i < jumpHeight; i++)
             {
                 currentYPosition -= jumpSpeed;
@@ -66,5 +46,23 @@ namespace TrexDash
                 Thread.Sleep(20);
             }
         }
+        protected void DecreaseHealth() => health--;
+        protected void IncreaseHealth() { if (health < 3) health++; }
+        protected void SetHealth(int value) => health = value;
+    }
+    public class Dino : Character
+    {
+        public Dino(Canvas mainCanvas)
+        : base(mainCanvas, "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\Final Coloured Dino.png") { }
+    }
+    public class Cow : Character
+    {
+        public Cow(Canvas mainCanvas)
+        : base(mainCanvas, "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\Cow.png") { }
+    }
+    public class UFO : Character
+    {
+        public UFO(Canvas mainCanvas)
+        : base(mainCanvas, "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\UFO.png") { }
     }
 }
