@@ -70,6 +70,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Obstacles.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -105,6 +106,21 @@
     <Resource Include="Cow.png" />
     <Resource Include="Final Coloured Dino.png" />
     <Resource Include="UFO.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Coloured Ghost cactus 1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Coloured healing cactus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Coloured sharp cactus 1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Coloured sharp cactus 2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Coloured sharp cactus.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
