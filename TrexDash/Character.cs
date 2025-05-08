@@ -19,7 +19,10 @@ namespace TrexDash
         protected double currentYPosition = 0;
         protected int jumpHeight = 20;
         protected int jumpSpeed = 2;
-        protected Image image;
+        public Image image;
+
+        public int Health { get; internal set; }
+
         protected Character(Canvas mainCanvas, string imagePath)
         {
             image = new Image

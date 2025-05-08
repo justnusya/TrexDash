@@ -122,5 +122,11 @@
   <ItemGroup>
     <Resource Include="Coloured sharp cactus.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="0hearts.png" />
+    <Resource Include="1heart.png" />
+    <Resource Include="2hearts.png" />
+    <Resource Include="3hearts.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
