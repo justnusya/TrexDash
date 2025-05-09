@@ -22,12 +22,14 @@ namespace TrexDash
     {
         int charCount = 2;
         private Func<Canvas, Character> characterFactory;
+        private Character player;
         public MainWindow()
         {
             InitializeComponent();
             MainCanvas.Children.Clear();
             MainCanvas.Children.Add(StartThubmnail);
             MainCanvas.Children.Add(StartButton);
+            this.KeyDown += MainWindow_KeyDown;
         }
 
         private void StartButtonClick(object sender, RoutedEventArgs e)
@@ -78,7 +80,14 @@ namespace TrexDash
         private void PlayButtonClick(object sender, RoutedEventArgs e)
         {
             MainCanvas.Children.Clear();
-            Character player = characterFactory(MainCanvas);
+            player = characterFactory(MainCanvas);
+        }
+        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                Task.Run(async () => await player.Jump());
+            }
         }
     }
 }

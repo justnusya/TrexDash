@@ -18,13 +18,14 @@ namespace TrexDash
         protected int health=3;
         protected double currentYPosition = 0;
         protected int jumpHeight = 20;
-        protected int jumpSpeed = 2;
+        protected int jumpSpeed = 5;
         public Image image;
 
         public int Health { get; internal set; }
 
         protected Character(Canvas mainCanvas, string imagePath)
         {
+            currentYPosition = y;
             image = new Image
             {
                 Source = new BitmapImage(new Uri(imagePath)),
@@ -34,19 +35,28 @@ namespace TrexDash
             Canvas.SetTop(image, y);
             mainCanvas.Children.Add(image);
         }
-        public virtual void Jump()
+        public virtual async Task Jump()
         {
             for (int i = 0; i < jumpHeight; i++)
             {
                 currentYPosition -= jumpSpeed;
-                image.SetValue(Canvas.TopProperty, currentYPosition);
-                Thread.Sleep(20);
+                image.Dispatcher.Invoke(() =>
+                {
+                    image.SetValue(Canvas.TopProperty, currentYPosition);
+                });
+
+                await Task.Delay(20);
             }
             for (int i = 0; i < jumpHeight; i++)
             {
                 currentYPosition += jumpSpeed;
-                image.SetValue(Canvas.TopProperty, currentYPosition);
-                Thread.Sleep(20);
+
+                image.Dispatcher.Invoke(() =>
+                {
+                    image.SetValue(Canvas.TopProperty, currentYPosition);
+                });
+
+                await Task.Delay(20);
             }
         }
         protected void DecreaseHealth() => health--;
