@@ -7,19 +7,25 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-
+using System.Threading;
+using System.Timers;
+using System.Windows.Threading;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Media;
 namespace TrexDash
 {
     public abstract class MovingObject
     {
-        protected int x = 500;
+        protected int x = 780;
         protected int y = 260;
         protected int height = 70;
-        protected Image image;
+        public Image image;
         protected Canvas mainCanvas;
-        public int speed { get; set; } = 2;
+        public int speed { get; set; } = 10;
         protected MovingObject(Canvas mainCanvas, string imagePath)
         {
+            this.mainCanvas = mainCanvas;
             this.speed= speed;
             image = new Image
             {
@@ -30,16 +36,73 @@ namespace TrexDash
             Canvas.SetTop(image, y);
             mainCanvas.Children.Add(image);
         }
-        public void MoveLeft(int deltaTime)
+        public void StartMoving()
         {
-            x -= speed * deltaTime;
-            Canvas.SetLeft(image, x);
+            Task.Run(async () => await MoveLeft());
         }
+        private async Task MoveLeft()
+        {
+            while (true)
+            {
+                x -= 10;
+
+                await image.Dispatcher.InvokeAsync(() =>
+                {
+                    Canvas.SetLeft(image, x);
+                });
+
+                if (x < -image.ActualWidth)
+                {
+                    
+                    await image.Dispatcher.InvokeAsync(() =>
+                    {
+                        mainCanvas.Children.Remove(image);
+                    });
+                    
+                    break;
+                }
+
+                await Task.Delay(20);
+            }
+        }
+
     }
-    public class GhostCactus : MovingObject
+    public class GhostCactus : MovingObject, IObstacleIteraction
     {
         public GhostCactus(Canvas mainCanvas)
         : base(mainCanvas, "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\Coloured Ghost cactus 1.png") { }
+        public void Interact(Character character)
+        {
+            var textBox = new TextBox
+            {
+                Text = "Boo!",
+                FontSize = 24,
+                Background = Brushes.Transparent,
+                Foreground = Brushes.Red,
+                BorderThickness = new Thickness(0),
+                IsReadOnly = true
+            };
+
+            double left = mainCanvas.ActualWidth / 2 - 30;
+            double top = 10; 
+
+            Canvas.SetLeft(textBox, left);
+            Canvas.SetTop(textBox, top);
+
+            mainCanvas.Dispatcher.Invoke(() =>
+            {
+                mainCanvas.Children.Add(textBox);
+            });
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(3000);
+                textBox.Dispatcher.Invoke(() =>
+                {
+                    mainCanvas.Children.Remove(textBox);
+                });
+            });
+        }
     }
     public class HealingCactus : MovingObject, IObstacleIteraction
     {
@@ -128,6 +191,7 @@ namespace TrexDash
             }
         }
     }
+
     public interface IObstacleIteraction
     {
         void Interact(Character character);

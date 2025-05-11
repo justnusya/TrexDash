@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -12,12 +13,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace TrexDash
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         int charCount = 2;
@@ -81,12 +80,45 @@ namespace TrexDash
         {
             MainCanvas.Children.Clear();
             player = characterFactory(MainCanvas);
+            _ = SpawnObstacles();
         }
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Space)
             {
                 Task.Run(async () => await player.Jump());
+            }
+        }
+
+        private async Task SpawnObstacles()
+        {
+            Random rand = new Random();
+
+            while (player.Health > 0)
+            {
+                int num = rand.Next(4);
+                IObstacleIteraction obstacle = null;
+
+                switch (num)
+                {
+                    case 0:
+                        obstacle = new UsualCactus(MainCanvas);
+                        break;
+                    case 1:
+                        obstacle = new HealingCactus(MainCanvas);
+                        break;
+                    case 2:
+                        obstacle = new BossCactus(MainCanvas);
+                        break;
+                    case 3:
+                        obstacle = new GhostCactus(MainCanvas);
+                        break;
+                }
+                if (obstacle != null)
+                {
+                    (obstacle as MovingObject)?.StartMoving();
+                }
+                await Task.Delay(3000);
             }
         }
     }

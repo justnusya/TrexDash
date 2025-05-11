@@ -17,11 +17,15 @@ namespace TrexDash
         protected int height = 70;
         protected int health=3;
         protected double currentYPosition = 0;
-        protected int jumpHeight = 20;
+        protected int jumpHeight = 25;
         protected int jumpSpeed = 5;
         public Image image;
 
-        public int Health { get; internal set; }
+        public int Health
+        {
+            get => health;
+            internal set => health = value;
+        }
 
         protected Character(Canvas mainCanvas, string imagePath)
         {
@@ -45,7 +49,7 @@ namespace TrexDash
                     image.SetValue(Canvas.TopProperty, currentYPosition);
                 });
 
-                await Task.Delay(20);
+                await Task.Delay(jumpSpeed*3);
             }
             for (int i = 0; i < jumpHeight; i++)
             {
@@ -56,7 +60,7 @@ namespace TrexDash
                     image.SetValue(Canvas.TopProperty, currentYPosition);
                 });
 
-                await Task.Delay(20);
+                await Task.Delay(jumpSpeed * 3);
             }
         }
         protected void DecreaseHealth() => health--;
