@@ -90,7 +90,7 @@ namespace TrexDash
     public class GhostCactus : MovingObject, IObstacleInteraction
     {
         public GhostCactus(Canvas mainCanvas)
-        : base(mainCanvas, "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\Coloured Ghost cactus 1.png") { }
+        : base(mainCanvas, "pack://application:,,,/images/Coloured%20Ghost%20cactus%201.png") { }
         public void Interact(Character character)
         {
             var textBox = new TextBox
@@ -131,7 +131,7 @@ namespace TrexDash
     public class HealingCactus : MovingObject, IObstacleInteraction
     {
         public HealingCactus(Canvas mainCanvas)
-        : base(mainCanvas, "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\Coloured healing cactus.png") { }
+        : base(mainCanvas, "pack://application:,,,/images/Coloured%20healing%20cactus.png") { }
         public void Interact(Character character)
         {
             if (isCollided(character))
@@ -143,7 +143,7 @@ namespace TrexDash
     public class BossCactus : MovingObject, IObstacleInteraction
     {
         public BossCactus(Canvas mainCanvas)
-        : base(mainCanvas, "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\Coloured sharp cactus 1.png") { }
+        : base(mainCanvas, "pack://application:,,,/images/Coloured%20sharp%20cactus%201.png") { }
         public void Interact(Character character)
         {
             if (isCollided(character))
@@ -162,9 +162,9 @@ namespace TrexDash
         {
             int choice = rand.Next(2);
             if(choice == 0)
-                return "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\Coloured sharp cactus.png";
+                return "pack://application:,,,/images/Coloured%20sharp%20cactus.png";
             else
-                return "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\Coloured sharp cactus 2.png";
+                return "pack://application:,,,/images/Coloured%20sharp%20cactus%202.png";
         }
         public void Interact(Character character)
         {

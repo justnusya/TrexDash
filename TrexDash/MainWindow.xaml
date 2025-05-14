@@ -69,7 +69,7 @@
     </Window.Resources>
     <Canvas x:Name="MainCanvas">
         <Image x:Name="StartThubmnail" Height="Auto" Width="835" 
-               Source="C:\Users\Legion\source\repos\TrexDash\TrexDash\Thumbnail.png" Canvas.Left="0" Canvas.Top="0"/>
+               Source="pack://application:,,,/images/Thumbnail.png" Canvas.Left="0" Canvas.Top="0"/>
 
         <Button x:Name="StartButton" Content="Start" BorderBrush="Black" BorderThickness="3" Background="#FF377D22" FontSize="16" FontFamily="Consolas"
                 HorizontalAlignment="Center" VerticalAlignment="Center" Width="105" Height="35" FontWeight="Bold" 
@@ -77,7 +77,7 @@
         </Button>
 
         <Image x:Name="ChoosingCharBackground" Height="Auto" Width="835" Canvas.Left="0" Canvas.Top="0"
-               Source="C:\Users\Legion\source\repos\TrexDash\TrexDash\ChoosingCharBackground.png"/>
+               Source="pack://application:,,,/images/ChoosingCharBackground.png"/>
 
         <Button x:Name="RightButton" Width="60" Height="60" Click="RightButtonClick" Canvas.Left="595" Canvas.Top="220">
             <Button.RenderTransform>
@@ -130,13 +130,13 @@
             </Button.Template>
         </Button>
         <Image x:Name="Dino" Height="110" Canvas.Top="190" Canvas.Left="350"
-               Source="C:\Users\Legion\source\repos\TrexDash\TrexDash\Final Coloured Dino.png"/>
+               Source="pack://application:,,,/images/Final%20Coloured%20Dino.png"/>
 
         <Image x:Name="Cow" Height="110" Canvas.Top="190" Canvas.Left="335"
-               Source="C:\Users\Legion\source\repos\TrexDash\TrexDash\Cow.png"/>
+               Source="pack://application:,,,/images/Cow.png"/>
 
         <Image x:Name="UFO" Height="130" Canvas.Top="175" Canvas.Left="330"
-               Source="C:\Users\Legion\source\repos\TrexDash\TrexDash\UFO.png"/>
+               Source="pack://application:,,,/images/UFO.png"/>
         
         <Button x:Name="PlayButton" Content="Play" BorderBrush="Black" BorderThickness="3" Background="#FF377D22" FontSize="16" FontFamily="Consolas"
                 Canvas.Left="362" Canvas.Top="330" Width="105" Height="35" FontWeight="Bold" 

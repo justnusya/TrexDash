@@ -96,17 +96,17 @@ namespace TrexDash
     public class Dino : Character
     {
         public Dino(Canvas mainCanvas)
-        : base(mainCanvas, "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\Final Coloured Dino.png") { }
+        : base(mainCanvas, "pack://application:,,,/images/Final%20Coloured%20Dino.png") { }
     }
     public class Cow : Character
     {
         public Cow(Canvas mainCanvas)
-        : base(mainCanvas, "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\Cow.png") { }
+        : base(mainCanvas, "pack://application:,,,/images/Cow.png") { }
     }
     public class UFO : Character
     {
         public UFO(Canvas mainCanvas)
-        : base(mainCanvas, "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\UFO.png") { }
+        : base(mainCanvas, "pack://application:,,,/images/UFO.png") { }
     }
     public class Heart
     {
@@ -118,10 +118,10 @@ namespace TrexDash
 
         private string[] heartImages =
         {
-            "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\0hearts.png",
-            "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\1heart.png",
-            "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\2hearts.png",
-            "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\3hearts.png"
+            "pack://application:,,,/images/0hearts.png",
+            "pack://application:,,,/images/1heart.png",
+            "pack://application:,,,/images/2hearts.png",
+            "pack://application:,,,/images/3hearts.png"
         };
         public Heart(Canvas mainCanvas, Character charac)
         {
