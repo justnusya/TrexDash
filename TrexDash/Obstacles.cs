@@ -13,10 +13,12 @@ using System.Windows.Threading;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Documents;
 namespace TrexDash
 {
     public abstract class MovingObject
     {
+        public event Action<MovingObject> OnDestroyed;
         protected int x = 780;
         protected int y = 260;
         protected int height = 70;
@@ -40,6 +42,7 @@ namespace TrexDash
         {
             Task.Run(async () => await MoveLeft());
         }
+        
         private async Task MoveLeft()
         {
             while (true)
@@ -58,16 +61,33 @@ namespace TrexDash
                     {
                         mainCanvas.Children.Remove(image);
                     });
-                    
+                    OnDestroyed?.Invoke(this);
                     break;
                 }
-
+               
                 await Task.Delay(20);
             }
         }
+        protected bool isCollided(Character character)
+        {
+            double charLeft = Canvas.GetLeft(character.image);
+            double charTop = Canvas.GetTop(character.image);
+            double charRight = charLeft + character.image.ActualWidth;
+            double charBottom = charTop + character.image.ActualHeight;
 
+            double cactusLeft = Canvas.GetLeft(this.image);
+            double cactusTop = Canvas.GetTop(this.image);
+            double cactusRight = cactusLeft + this.image.ActualWidth;
+            double cactusBottom = cactusTop + this.image.ActualHeight;
+
+            bool isColliding = !(charRight < cactusLeft ||
+                                charLeft > cactusRight ||
+                                charBottom < cactusTop ||
+                                charTop > cactusBottom);
+            return isColliding;
+        }
     }
-    public class GhostCactus : MovingObject, IObstacleIteraction
+    public class GhostCactus : MovingObject, IObstacleInteraction
     {
         public GhostCactus(Canvas mainCanvas)
         : base(mainCanvas, "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\Coloured Ghost cactus 1.png") { }
@@ -76,27 +96,31 @@ namespace TrexDash
             var textBox = new TextBox
             {
                 Text = "Boo!",
-                FontSize = 24,
+                FontSize = 34,
+                FontWeight = FontWeights.Bold,
                 Background = Brushes.Transparent,
-                Foreground = Brushes.Red,
+                Foreground = Brushes.Black,
                 BorderThickness = new Thickness(0),
                 IsReadOnly = true
             };
 
             double left = mainCanvas.ActualWidth / 2 - 30;
-            double top = 10; 
+            double top = 10;
 
-            Canvas.SetLeft(textBox, left);
-            Canvas.SetTop(textBox, top);
-
-            mainCanvas.Dispatcher.Invoke(() =>
+            if (isCollided(character))
             {
-                mainCanvas.Children.Add(textBox);
-            });
+                Canvas.SetLeft(textBox, left);
+                Canvas.SetTop(textBox, top);
+
+                mainCanvas.Dispatcher.Invoke(() =>
+                {
+                    mainCanvas.Children.Add(textBox);
+                });
+            }
 
             Task.Run(async () =>
             {
-                await Task.Delay(3000);
+                await Task.Delay(2000);
                 textBox.Dispatcher.Invoke(() =>
                 {
                     mainCanvas.Children.Remove(textBox);
@@ -104,60 +128,33 @@ namespace TrexDash
             });
         }
     }
-    public class HealingCactus : MovingObject, IObstacleIteraction
+    public class HealingCactus : MovingObject, IObstacleInteraction
     {
         public HealingCactus(Canvas mainCanvas)
         : base(mainCanvas, "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\Coloured healing cactus.png") { }
         public void Interact(Character character)
         {
-            double charLeft = Canvas.GetLeft(character.image);
-            double charTop = Canvas.GetTop(character.image);
-            double charRight = charLeft + character.image.ActualWidth;
-            double charBottom = charTop + character.image.ActualHeight;
-
-            double cactusLeft = Canvas.GetLeft(this.image);
-            double cactusTop = Canvas.GetTop(this.image);
-            double cactusRight = cactusLeft + this.image.ActualWidth;
-            double cactusBottom = cactusTop + this.image.ActualHeight;
-
-            bool isColliding = !(charRight < cactusLeft || charLeft > cactusRight ||
-                                 charBottom < cactusTop || charTop > cactusBottom);
-
-            if (isColliding)
+            if (isCollided(character))
             {
-                var decreaseHealthMethod = character.GetType().GetMethod("IncreaseHealth", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                decreaseHealthMethod?.Invoke(character, null);
+                character.IncreaseHealth();
             }
         }
     }
-    public class BossCactus : MovingObject, IObstacleIteraction
+    public class BossCactus : MovingObject, IObstacleInteraction
     {
         public BossCactus(Canvas mainCanvas)
         : base(mainCanvas, "C:\\Users\\Legion\\source\\repos\\TrexDash\\TrexDash\\Coloured sharp cactus 1.png") { }
         public void Interact(Character character)
         {
-            double charLeft = Canvas.GetLeft(character.image);
-            double charTop = Canvas.GetTop(character.image);
-            double charRight = charLeft + character.image.ActualWidth;
-            double charBottom = charTop + character.image.ActualHeight;
-
-            double cactusLeft = Canvas.GetLeft(this.image);
-            double cactusTop = Canvas.GetTop(this.image);
-            double cactusRight = cactusLeft + this.image.ActualWidth;
-            double cactusBottom = cactusTop + this.image.ActualHeight;
-
-            bool isColliding = !(charRight < cactusLeft || charLeft > cactusRight ||
-                                 charBottom < cactusTop || charTop > cactusBottom);
-
-            if (isColliding)
+            if (isCollided(character))
             {
-                var decreaseHealthMethod = character.GetType().GetMethod("SetHealth", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                decreaseHealthMethod?.Invoke(character, new object[] { 0 });
+                character.SetHealth(0);
             }
         }
     }
-    public class UsualCactus : MovingObject, IObstacleIteraction
+    public class UsualCactus : MovingObject, IObstacleInteraction
     {
+
         private static Random rand = new Random();
         public UsualCactus(Canvas mainCanvas)
         : base(mainCanvas, GetImagePath()) { }
@@ -171,28 +168,15 @@ namespace TrexDash
         }
         public void Interact(Character character)
         {
-            double charLeft = Canvas.GetLeft(character.image);
-            double charTop = Canvas.GetTop(character.image);
-            double charRight = charLeft + character.image.ActualWidth;
-            double charBottom = charTop + character.image.ActualHeight;
-
-            double cactusLeft = Canvas.GetLeft(this.image);
-            double cactusTop = Canvas.GetTop(this.image);
-            double cactusRight = cactusLeft + this.image.ActualWidth;
-            double cactusBottom = cactusTop + this.image.ActualHeight;
-
-            bool isColliding = !(charRight < cactusLeft || charLeft > cactusRight ||
-                                 charBottom < cactusTop || charTop > cactusBottom);
-
-            if (isColliding)
+            if (!character.IsVulnerable) return;
+            
+            if (isCollided(character))
             {
-                var decreaseHealthMethod = character.GetType().GetMethod("DecreaseHealth", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                decreaseHealthMethod?.Invoke(character, null);
+                character.DecreaseHealth();
             }
         }
     }
-
-    public interface IObstacleIteraction
+    public interface IObstacleInteraction
     {
         void Interact(Character character);
     }

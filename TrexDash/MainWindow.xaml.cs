@@ -17,11 +17,16 @@ using System.Windows.Threading;
 
 namespace TrexDash
 {
+
     public partial class MainWindow : Window
     {
+        private List<IObstacleInteraction> activeObstacles = new List<IObstacleInteraction>();
+        public int count = 1;
         int charCount = 2;
         private Func<Canvas, Character> characterFactory;
         private Character player;
+        private DispatcherTimer collisionTimer;
+        private Heart heart;
         public MainWindow()
         {
             InitializeComponent();
@@ -29,8 +34,16 @@ namespace TrexDash
             MainCanvas.Children.Add(StartThubmnail);
             MainCanvas.Children.Add(StartButton);
             this.KeyDown += MainWindow_KeyDown;
-        }
 
+            collisionTimer = new DispatcherTimer();
+            collisionTimer.Interval = TimeSpan.FromMilliseconds(20);
+            collisionTimer.Tick += CollisionTimer_Tick;
+        }
+        private void CollisionTimer_Tick(object sender, EventArgs e)
+        {
+            CheckCollisions();
+            heart?.Update();
+        }
         private void StartButtonClick(object sender, RoutedEventArgs e)
         {
             MainCanvas.Children.Remove(StartThubmnail);
@@ -40,14 +53,12 @@ namespace TrexDash
                 MainCanvas.Children.Add(el);
             SetCharacterVisibility(2);
         }
-
         private void RightButtonClick(object sender, RoutedEventArgs e)
         {
             charCount++;
             if (charCount > 2) { charCount = 0; }
             SetCharacterVisibility(charCount);
         }
-
         private void LeftButtonClick(object sender, RoutedEventArgs e)
         {
             charCount--;
@@ -80,25 +91,30 @@ namespace TrexDash
         {
             MainCanvas.Children.Clear();
             player = characterFactory(MainCanvas);
+            heart = new Heart(MainCanvas, player);
             _ = SpawnObstacles();
+            collisionTimer.Start();
         }
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Space)
+            if (e.Key == Key.Space && count == 1)
             {
-                Task.Run(async () => await player.Jump());
+                count = 0;
+                Task.Run(async () =>
+                {
+                    await player.Jump();
+                    count = 1; 
+                });
             }
         }
-
         private async Task SpawnObstacles()
         {
             Random rand = new Random();
 
-            while (player.Health > 0)
+            while (player.health > 0)
             {
+                IObstacleInteraction obstacle = null;
                 int num = rand.Next(4);
-                IObstacleIteraction obstacle = null;
-
                 switch (num)
                 {
                     case 0:
@@ -116,9 +132,27 @@ namespace TrexDash
                 }
                 if (obstacle != null)
                 {
+                    activeObstacles.Add(obstacle);
                     (obstacle as MovingObject)?.StartMoving();
                 }
-                await Task.Delay(3000);
+
+                await Task.Delay(2000);
+            }
+        }
+        private void CheckCollisions()
+        {
+            for (int i = activeObstacles.Count - 1; i >= 0; i--)
+            {
+                var obstacle = activeObstacles[i];
+                var movingObstacle = obstacle as MovingObject;
+
+                if (movingObstacle != null && Canvas.GetLeft(movingObstacle.image) < -movingObstacle.image.ActualWidth)
+                {
+                    MainCanvas.Children.Remove(movingObstacle.image);
+                    activeObstacles.RemoveAt(i);
+                    continue;
+                }
+                obstacle.Interact(player);
             }
         }
     }
