@@ -137,7 +137,7 @@
 
         <Image x:Name="UFO" Height="130" Canvas.Top="175" Canvas.Left="330"
                Source="pack://application:,,,/images/UFO.png"/>
-        
+
         <Button x:Name="PlayButton" Content="Play" BorderBrush="Black" BorderThickness="3" Background="#FF377D22" FontSize="16" FontFamily="Consolas"
                 Canvas.Left="362" Canvas.Top="330" Width="105" Height="35" FontWeight="Bold" 
                 Style="{DynamicResource StartButton}" Click="PlayButtonClick">

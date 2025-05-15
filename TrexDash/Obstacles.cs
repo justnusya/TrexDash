@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Documents;
+using System.Windows.Shapes;
 namespace TrexDash
 {
     public abstract class MovingObject
@@ -93,39 +94,47 @@ namespace TrexDash
         : base(mainCanvas, "pack://application:,,,/images/Coloured%20Ghost%20cactus%201.png") { }
         public void Interact(Character character)
         {
-            var textBox = new TextBox
-            {
-                Text = "Boo!",
-                FontSize = 34,
-                FontWeight = FontWeights.Bold,
-                Background = Brushes.Transparent,
-                Foreground = Brushes.Black,
-                BorderThickness = new Thickness(0),
-                IsReadOnly = true
-            };
-
-            double left = mainCanvas.ActualWidth / 2 - 30;
-            double top = 10;
-
             if (isCollided(character))
             {
+                var textBox = new TextBox
+                {
+                    Text = "Boo!",
+                    FontSize = 44,
+                    FontWeight = FontWeights.Bold,
+                    Background = Brushes.Transparent,
+                    Foreground = Brushes.White,
+                    BorderThickness = new Thickness(0),
+                    IsReadOnly = true
+                };
+
+                double left = mainCanvas.ActualWidth / 2 - 30;
+                double top = 200;
                 Canvas.SetLeft(textBox, left);
                 Canvas.SetTop(textBox, top);
 
+                Rectangle rect = new Rectangle
+                {
+                    Height = 560,
+                    Width = 850,
+                    Fill = Brushes.Black,
+                    Opacity = 0.7
+                };
                 mainCanvas.Dispatcher.Invoke(() =>
                 {
+                    mainCanvas.Children.Add(rect);
                     mainCanvas.Children.Add(textBox);
+                    
+                });
+                Task.Run(async () =>
+                {
+                    await Task.Delay(500);
+                    textBox.Dispatcher.Invoke(() =>
+                    {
+                        mainCanvas.Children.Remove(textBox);
+                        mainCanvas.Children.Remove(rect);
+                    });
                 });
             }
-
-            Task.Run(async () =>
-            {
-                await Task.Delay(2000);
-                textBox.Dispatcher.Invoke(() =>
-                {
-                    mainCanvas.Children.Remove(textBox);
-                });
-            });
         }
     }
     public class HealingCactus : MovingObject, IObstacleInteraction
@@ -134,6 +143,8 @@ namespace TrexDash
         : base(mainCanvas, "pack://application:,,,/images/Coloured%20healing%20cactus.png") { }
         public void Interact(Character character)
         {
+            if (!character.IsVulnerable) return;
+
             if (isCollided(character))
             {
                 character.IncreaseHealth();
@@ -173,7 +184,26 @@ namespace TrexDash
             if (isCollided(character))
             {
                 character.DecreaseHealth();
+                RedFlashing();
             }
+        }
+        private async void RedFlashing()
+        {
+            Rectangle rect = new Rectangle
+            {
+                Height = 560,
+                Width = 850,
+                Fill = Brushes.Red,
+                Opacity = 0.4
+            };
+
+            mainCanvas.Children.Add(rect);
+            await Task.Delay(200);
+            mainCanvas.Children.Remove(rect);
+            await Task.Delay(150);
+            mainCanvas.Children.Add(rect);
+            await Task.Delay(200);
+            mainCanvas.Children.Remove(rect);
         }
     }
     public interface IObstacleInteraction

@@ -19,7 +19,7 @@ namespace TrexDash
         protected int height = 70;
         public int health=3;
         protected double currentYPosition = 0;
-        protected int jumpHeight = 25;
+        protected int jumpHeight = 26;
         protected int jumpSpeed = 5;
         public Image image;
         protected Heart heart;
@@ -84,8 +84,13 @@ namespace TrexDash
         }
         public void IncreaseHealth()
         {
-            if (health < 3) health++;
+            if (!isVulnerable) return;
+
+            if (health < 3)health++;
             heart?.Update();
+
+            isVulnerable = false;
+            invulnerabilityTimer.Start();
         }
         public void SetHealth(int value)
         {

@@ -90,6 +90,17 @@ namespace TrexDash
         private void PlayButtonClick(object sender, RoutedEventArgs e)
         {
             MainCanvas.Children.Clear();
+            Rectangle line = new Rectangle
+            {
+                Width = 850,
+                Height = 210,
+                Fill = new SolidColorBrush(Color.FromArgb(30, 255, 255, 0)),
+                Stroke = Brushes.Black,
+                StrokeThickness = 2
+            }; 
+            Canvas.SetTop(line, 320);
+            MainCanvas.Children.Add(line);
+            
             player = characterFactory(MainCanvas);
             heart = new Heart(MainCanvas, player);
             _ = SpawnObstacles();
@@ -138,6 +149,7 @@ namespace TrexDash
 
                 await Task.Delay(2000);
             }
+            if (player.health <= 0) GameOver();
         }
         private void CheckCollisions()
         {
@@ -153,6 +165,46 @@ namespace TrexDash
                     continue;
                 }
                 obstacle.Interact(player);
+            }
+        }
+        private void GameOver()
+        {
+            if (player.health <= 0)
+            {
+                TextBlock text = new TextBlock()
+                {
+                    Text = "GAME OVER",
+                    FontSize = 64,
+                    FontWeight = FontWeights.Bold,
+                    Foreground = Brushes.White,
+                    FontFamily = new FontFamily("Bauhaus 93")
+                };
+                Canvas.SetLeft(text, 260);
+                Canvas.SetTop(text, 200);
+                Rectangle rect = new Rectangle()
+                {
+                    Width = ActualWidth,
+                    Height = ActualHeight,
+                    Fill = Brushes.Black
+                };
+                Image sadCow = new Image
+                {
+                    Source = new BitmapImage(new Uri("pack://application:,,,/images/SadCow.png")),
+                    Height= 320,
+                };
+                Canvas.SetLeft(sadCow, -245);
+                Canvas.SetTop(sadCow, 20);
+                Image deadDino = new Image
+                {
+                    Source = new BitmapImage(new Uri("pack://application:,,,/images/DeadDino.png")),
+                    Height = 430,
+                };
+                Canvas.SetRight(deadDino, -245);
+                Canvas.SetTop(deadDino, 230);
+                MainCanvas.Children.Add(rect);
+                MainCanvas.Children.Add(text);
+                MainCanvas.Children.Add(sadCow);
+                MainCanvas.Children.Add(deadDino);
             }
         }
     }

@@ -99,6 +99,8 @@
     <Resource Include="images\Final Coloured Dino.png" />
     <Resource Include="images\Thumbnail.png" />
     <Resource Include="images\UFO.png" />
+    <Resource Include="images\DeadDino.png" />
+    <Resource Include="images\SadCow.png" />
     <Content Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
