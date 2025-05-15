@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.IO;
+using System.Text.Json;
 
 namespace TrexDash
 {
@@ -27,6 +29,14 @@ namespace TrexDash
         private Character player;
         private DispatcherTimer collisionTimer;
         private Heart heart;
+        private int currScore = 0;
+        private int bestScore = 0;
+        private DispatcherTimer scoreTimer;
+        private const string ScoresFilePath = "scores.json";
+        public class GameScores
+        {
+            public int BestScore { get; set; }
+        }
         public MainWindow()
         {
             InitializeComponent();
@@ -38,6 +48,11 @@ namespace TrexDash
             collisionTimer = new DispatcherTimer();
             collisionTimer.Interval = TimeSpan.FromMilliseconds(20);
             collisionTimer.Tick += CollisionTimer_Tick;
+
+            LoadBestScore();
+            scoreTimer = new DispatcherTimer();
+            scoreTimer.Interval = TimeSpan.FromMilliseconds(30);
+            scoreTimer.Tick += ScoreTimer_Tick;
         }
         private void CollisionTimer_Tick(object sender, EventArgs e)
         {
@@ -90,6 +105,7 @@ namespace TrexDash
         private void PlayButtonClick(object sender, RoutedEventArgs e)
         {
             MainCanvas.Children.Clear();
+            currScore = 0;
             Rectangle line = new Rectangle
             {
                 Width = 850,
@@ -101,10 +117,26 @@ namespace TrexDash
             Canvas.SetTop(line, 320);
             MainCanvas.Children.Add(line);
             
+            TextBlock scoreText = new TextBlock
+            {
+                Name = "ScoreText",
+                FontSize = 20,
+                FontWeight = FontWeights.Bold,
+                Foreground = Brushes.Black,
+                FontFamily = new FontFamily("Cascadia Code"),
+                Text = $"{currScore.ToString("000000")}"
+            };
+            Canvas.SetRight(scoreText, 20);
+            Canvas.SetTop(scoreText, 20);
+            MainCanvas.Children.Add(scoreText);
+            
             player = characterFactory(MainCanvas);
             heart = new Heart(MainCanvas, player);
             _ = SpawnObstacles();
             collisionTimer.Start();
+
+            scoreTimer.Start();
+            UpdateScoreDisplay();
         }
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
@@ -153,6 +185,7 @@ namespace TrexDash
         }
         private void CheckCollisions()
         {
+            if (player.health <= 0) return;
             for (int i = activeObstacles.Count - 1; i >= 0; i--)
             {
                 var obstacle = activeObstacles[i];
@@ -165,46 +198,193 @@ namespace TrexDash
                     continue;
                 }
                 obstacle.Interact(player);
+
+                if (player.health <= 0)
+                {
+                    GameOver();
+                    break;
+                }
             }
         }
         private void GameOver()
         {
-            if (player.health <= 0)
+            scoreTimer.Stop();
+            collisionTimer.Stop();
+
+            if (currScore > bestScore)
             {
-                TextBlock text = new TextBlock()
+                bestScore = currScore;
+                SaveBestScore();
+            }
+            
+            foreach (var obstacle in activeObstacles)
+            {
+                if (obstacle is MovingObject movingObstacle)
                 {
-                    Text = "GAME OVER",
-                    FontSize = 64,
+                    movingObstacle.StopMoving();
+                }
+            }
+            TextBlock finalScoreText = new TextBlock()
+            {
+                Text = $"Your score: {currScore}\nBest score: {bestScore}",
+                FontSize = 20,
+                FontWeight = FontWeights.Bold,
+                Foreground = Brushes.White,
+                FontFamily = new FontFamily("Cascadia Code"),
+                TextAlignment = TextAlignment.Center
+            };
+            Canvas.SetLeft(finalScoreText, MainCanvas.ActualWidth / 2 - 100);
+            Canvas.SetTop(finalScoreText, MainCanvas.ActualHeight / 2);
+
+            TextBlock text = new TextBlock()
+            {
+                Text = "GAME OVER",
+                FontSize = 64,
+                FontWeight = FontWeights.Bold,
+                Foreground = Brushes.White,
+                FontFamily = new FontFamily("Bauhaus 93")
+            };
+            Canvas.SetLeft(text, 250);
+            Canvas.SetTop(text, 150);
+            Rectangle rect = new Rectangle()
+            {
+                Width = ActualWidth,
+                Height = ActualHeight,
+                Fill = Brushes.Black
+            };
+            Image sadCow = new Image
+            {
+                Source = new BitmapImage(new Uri("pack://application:,,,/images/SadCow.png")),
+                Height = 320,
+            };
+            Canvas.SetLeft(sadCow, -245);
+            Canvas.SetTop(sadCow, 20);
+            Image deadDino = new Image
+            {
+                Source = new BitmapImage(new Uri("pack://application:,,,/images/DeadDino.png")),
+                Height = 430,
+            };
+            Canvas.SetRight(deadDino, -245);
+            Canvas.SetTop(deadDino, 230);
+            MainCanvas.Children.Add(rect);
+            MainCanvas.Children.Add(finalScoreText);
+            MainCanvas.Children.Add(text);
+            MainCanvas.Children.Add(sadCow);
+            MainCanvas.Children.Add(deadDino);
+
+            Button resetScoreButton = new Button
+            {
+                Content = "↺",
+                Foreground = Brushes.White,
+                BorderThickness = new Thickness(0),
+                Background = Brushes.Transparent,
+                FontSize = 20,
+                Width = 30,
+                Height = 30,
+                FontWeight = FontWeights.Bold,
+                Style = (Style)FindResource("StartButton")
+            };
+            resetScoreButton.Click += (s, e) =>
+            {
+                MainCanvas.Children.Remove(finalScoreText);
+                bestScore = 0;
+                try
+                {
+                    if (File.Exists(ScoresFilePath))
+                    {
+                        File.Delete(ScoresFilePath);
+                    }
+                }
+                catch { }
+
+                TextBlock tempScoreBlock = new TextBlock()
+                {
+                    Text = $"Your score: {currScore}\nBest score: {0}",
+                    FontSize = 20,
                     FontWeight = FontWeights.Bold,
                     Foreground = Brushes.White,
-                    FontFamily = new FontFamily("Bauhaus 93")
+                    FontFamily = new FontFamily("Cascadia Code"),
+                    TextAlignment = TextAlignment.Center
                 };
-                Canvas.SetLeft(text, 260);
-                Canvas.SetTop(text, 200);
-                Rectangle rect = new Rectangle()
+                Canvas.SetLeft(tempScoreBlock, MainCanvas.ActualWidth / 2 - 100);
+                Canvas.SetTop(tempScoreBlock, MainCanvas.ActualHeight / 2);
+                MainCanvas.Children.Add(tempScoreBlock);
+            };
+            Canvas.SetLeft(resetScoreButton, MainCanvas.ActualWidth / 2 - 142);
+            Canvas.SetTop(resetScoreButton, MainCanvas.ActualHeight / 2 + 18);
+            MainCanvas.Children.Add(resetScoreButton);
+
+            Button playAgainButton = new Button
+            {
+                Content = "Play again",
+                BorderBrush = Brushes.Black,
+                BorderThickness = new Thickness(3),
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF377D22")),
+                FontSize = 16,
+                FontFamily = new FontFamily("Consolas"),
+                Width = 120,
+                Height = 40,
+                FontWeight = FontWeights.Bold,
+                Style = (Style)FindResource("StartButton")
+            };
+            playAgainButton.Click += (s, e) =>
+            {
+                MainCanvas.Children.Clear();
+                currScore = 0;
+                player.health = 3;
+                activeObstacles.Clear();
+                PlayButtonClick(null, null);
+            };
+            Canvas.SetLeft(playAgainButton, MainCanvas.ActualWidth / 2 - 60);
+            Canvas.SetTop(playAgainButton, MainCanvas.ActualHeight / 2 + 100);
+            MainCanvas.Children.Add(playAgainButton);
+        }
+        private void ScoreTimer_Tick(object sender, EventArgs e)
+        {
+            if (player != null && player.health > 0)
+            {
+                currScore++;
+                UpdateScoreDisplay();
+            }
+        }
+        private void UpdateScoreDisplay()
+        {
+            var scoreText = MainCanvas.Children.OfType<TextBlock>()
+        .FirstOrDefault(t => t.Name == "ScoreText");
+
+            if (scoreText != null)
+            {
+                scoreText.Text = $"{currScore.ToString("000000")}";
+            }
+        }
+        private void LoadBestScore()
+        {
+            try
+            {
+                if (File.Exists(ScoresFilePath))
                 {
-                    Width = ActualWidth,
-                    Height = ActualHeight,
-                    Fill = Brushes.Black
-                };
-                Image sadCow = new Image
-                {
-                    Source = new BitmapImage(new Uri("pack://application:,,,/images/SadCow.png")),
-                    Height= 320,
-                };
-                Canvas.SetLeft(sadCow, -245);
-                Canvas.SetTop(sadCow, 20);
-                Image deadDino = new Image
-                {
-                    Source = new BitmapImage(new Uri("pack://application:,,,/images/DeadDino.png")),
-                    Height = 430,
-                };
-                Canvas.SetRight(deadDino, -245);
-                Canvas.SetTop(deadDino, 230);
-                MainCanvas.Children.Add(rect);
-                MainCanvas.Children.Add(text);
-                MainCanvas.Children.Add(sadCow);
-                MainCanvas.Children.Add(deadDino);
+                    string json = File.ReadAllText(ScoresFilePath);
+                    var scores = JsonSerializer.Deserialize<GameScores>(json);
+                    bestScore = scores?.BestScore ?? 0;
+                }
+            }
+            catch
+            {
+                bestScore = 0;
+            }
+        }
+
+        private void SaveBestScore()
+        {
+            try
+            {
+                var scores = new GameScores { BestScore = bestScore };
+                string json = JsonSerializer.Serialize(scores);
+                File.WriteAllText(ScoresFilePath, json);
+            }
+            catch
+            {
+                
             }
         }
     }

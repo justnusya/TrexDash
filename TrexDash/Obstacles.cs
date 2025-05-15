@@ -20,6 +20,7 @@ namespace TrexDash
     public abstract class MovingObject
     {
         public event Action<MovingObject> OnDestroyed;
+        private bool isMoving = true;
         protected int x = 780;
         protected int y = 260;
         protected int height = 70;
@@ -43,10 +44,13 @@ namespace TrexDash
         {
             Task.Run(async () => await MoveLeft());
         }
-        
+        public void StopMoving()
+        {
+            isMoving = false;
+        }
         private async Task MoveLeft()
         {
-            while (true)
+            while (isMoving)
             {
                 x -= 10;
 
