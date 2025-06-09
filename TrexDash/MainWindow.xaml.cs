@@ -140,7 +140,7 @@ namespace TrexDash
         }
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Space && count == 1)
+            if (e.Key == Key.Space && count == 1 && player != null)
             {
                 count = 0;
                 Task.Run(async () =>
@@ -179,7 +179,7 @@ namespace TrexDash
                     (obstacle as MovingObject)?.StartMoving();
                 }
 
-                await Task.Delay(2000);
+                await Task.Delay(1500);
             }
             if (player.health <= 0) GameOver();
         }
@@ -376,16 +376,9 @@ namespace TrexDash
 
         private void SaveBestScore()
         {
-            try
-            {
-                var scores = new GameScores { BestScore = bestScore };
-                string json = JsonSerializer.Serialize(scores);
-                File.WriteAllText(ScoresFilePath, json);
-            }
-            catch
-            {
-                
-            }
+            var scores = new GameScores { BestScore = bestScore };
+            string json = JsonSerializer.Serialize(scores);
+            File.WriteAllText(ScoresFilePath, json);
         }
     }
 }
